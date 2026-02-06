@@ -6,13 +6,17 @@
   "scripts": {
     "dev": "next dev",
     "test": "jest",
-    "test:watch": "jest --watchAll"
+    "test:watch": "jest --watchAll",
+    "migration:create": "node-pg-migrate -m infra/migrations create",
+    "migration:up": "node-pg-migrate -m infra/migrations --envPath .env up"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "dotenv": "^16.4.4",
     "next": "^16.1.6",
+    "node-pg-migrate": "^6.2.2",
     "pg": "^8.11.3",
     "react": "^19.2.4",
     "react-dom": "^19.2.4"
