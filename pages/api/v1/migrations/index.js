@@ -5,6 +5,10 @@ import database from "infra/database";
 export default async function migrations(request, response) {
   let migration;
 
+  if (request.method != "GET" && request.method != "POST") {
+    return response.status(405).json({ data: "Method Not Allowed" });
+  }
+
   if (request.method === "GET") {
     const dbClient = await database.createDbClient();
 
@@ -18,7 +22,7 @@ export default async function migrations(request, response) {
     });
 
     await dbClient.end();
-    response.status(200).json(migration);
+    return response.status(200).json(migration);
   }
 
   if (request.method === "POST") {
@@ -34,6 +38,6 @@ export default async function migrations(request, response) {
     });
 
     await dbClient.end();
-    response.status(200).json(migration);
+    return response.status(200).json(migration);
   }
 }

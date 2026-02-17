@@ -12,7 +12,6 @@ test("POST to /api/v1/migrations should return 200", async () => {
   });
 
   const responseDB = await database.query("SELECT * FROM pgmigrations;");
-  console.log(responseDB.rows);
 
   expect(response.status).toBe(200);
 
