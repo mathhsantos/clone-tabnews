@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "next dev",
+    "dev": "npm run services:up && node infra/scripts/wait-for-postgres.js && npm run migration:up && next dev",
+    "services:up": "docker compose -f ./compose.yaml up -d",
+    "services:down": "docker compose -f ./compose.yaml down -v",
     "test": "jest --runInBand",
     "test:watch": "jest --watchAll --runInBand",
     "migration:create": "node-pg-migrate -m infra/migrations create",
