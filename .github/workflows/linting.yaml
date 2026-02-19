@@ -1,0 +1,32 @@
+name: Linting
+
+on: pull_request
+
+jobs:
+  prettier:
+    name: prettier
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "lts/krypton"
+
+      - run: npm ci
+
+      - run: lint:prettier:check
+
+    eslint:
+      name: eslint
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v4
+
+        - uses: actions/setup-node@v4
+          with:
+            node-version: "lts/krypton"
+
+        - run: npm ci
+
+        - run: lint:eslint:check
