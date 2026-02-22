@@ -1,0 +1,10 @@
+title = "clone-tabnews gitleaks config"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Allow local environment template placeholders"
+paths = [
+  '''(^|/)\.env\.example$''',
+]
