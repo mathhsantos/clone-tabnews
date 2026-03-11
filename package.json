@@ -27,7 +27,8 @@
     "node-pg-migrate": "^6.2.2",
     "pg": "^8.11.3",
     "react": "^19.2.4",
-    "react-dom": "^19.2.4"
+    "react-dom": "^19.2.4",
+    "swr": "2.4.1"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
