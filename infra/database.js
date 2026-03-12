@@ -9,7 +9,7 @@ async function query(queryObject) {
   } catch {
     console.log("Erro de conexão com o banco");
   } finally {
-    await client.end();
+    await client?.end();
   }
 }
 
