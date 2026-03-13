@@ -11,17 +11,17 @@ export default route.handler({
   onError: onErrorHandler,
 });
 
+async function onNoMatchHandler(request, response) {
+  const publicErrorObject = new MethodNotAllowedError();
+  response.status(publicErrorObject.status_code).json(publicErrorObject);
+}
+
 async function onErrorHandler(error, request, response) {
   const publicErrorObject = new InternalServerError({ cause: error });
 
   console.log("\n Erro dentro do catch do next-connect");
   console.error(publicErrorObject);
 
-  response.status(publicErrorObject.status_code).json(publicErrorObject);
-}
-
-async function onNoMatchHandler(request, response) {
-  const publicErrorObject = new MethodNotAllowedError();
   response.status(publicErrorObject.status_code).json(publicErrorObject);
 }
 

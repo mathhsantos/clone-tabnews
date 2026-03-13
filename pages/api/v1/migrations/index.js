@@ -15,6 +15,11 @@ export default route.handler({
   onError: onErrorHandler,
 });
 
+async function onNoMatchHandler(request, response) {
+  const publicErrorObject = new MethodNotAllowedError();
+  response.status(publicErrorObject.status_code).json(publicErrorObject);
+}
+
 async function onErrorHandler(error, request, response) {
   const publicErrorObject = new InternalServerError({ cause: error });
 
@@ -24,36 +29,21 @@ async function onErrorHandler(error, request, response) {
   response.status(publicErrorObject.status_code).json(publicErrorObject);
 }
 
-async function onNoMatchHandler(request, response) {
-  const publicErrorObject = new MethodNotAllowedError();
-  response.status(publicErrorObject.status_code).json(publicErrorObject);
-}
-
 async function getHandler(request, response) {
-  let migration;
-
-  const dbClient = await database.createDbClient();
-
-  migration = await migrationRunner({
-    dryRun: true,
-    dbClient: dbClient,
-    dir: join("infra", "migrations"),
-    direction: "up",
-    verbose: true,
-    migrationsTable: "pgmigrations",
-  });
-
-  await dbClient.end();
+  const migration = await generateMigration(true);
   return response.status(200).json(migration);
 }
 
 async function postHandler(request, response) {
-  let migration;
+  const migration = await generateMigration(false);
+  return response.status(200).json(migration);
+}
 
+async function generateMigration(booleandryrun) {
   const dbClient = await database.createDbClient();
 
-  migration = await migrationRunner({
-    dryRun: false,
+  const migration = await migrationRunner({
+    dryRun: booleandryrun,
     dbClient: dbClient,
     dir: join("infra", "migrations"),
     direction: "up",
@@ -62,5 +52,6 @@ async function postHandler(request, response) {
   });
 
   await dbClient.end();
-  return response.status(200).json(migration);
+
+  return migration;
 }
