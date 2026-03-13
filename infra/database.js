@@ -1,13 +1,18 @@
 import { Client } from "pg";
+import { ServiceError } from "./errors";
 
 async function query(queryObject) {
-  let client = await createDbClient();
-
+  let client;
   try {
+    client = await createDbClient();
     const result = await client.query(queryObject);
     return result;
-  } catch {
-    console.log("Erro de conexão com o banco");
+  } catch (error) {
+    const serviceErrorObject = new ServiceError({
+      cause: error,
+      message: "Erro de conexão com o banco ou na query",
+    });
+    throw serviceErrorObject;
   } finally {
     await client?.end();
   }
