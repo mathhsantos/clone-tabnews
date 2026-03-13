@@ -1,43 +1,44 @@
 import migrationRunner from "node-pg-migrate";
 import { join } from "node:path";
 import database from "infra/database";
+import { createRouter } from "next-connect";
+import controller from "infra/controller";
 
-export default async function migrations(request, response) {
+const route = createRouter();
+
+route.get(getHandler);
+route.post(postHandler);
+
+export default route.handler(controller.errorHandlers);
+
+async function getHandler(request, response) {
+  const migration = await generateMigration(true);
+  return response.status(200).json(migration);
+}
+
+async function postHandler(request, response) {
+  const migration = await generateMigration(false);
+  return response.status(200).json(migration);
+}
+
+async function generateMigration(booleanDryRun) {
   let migration;
+  let dbClient;
 
-  if (request.method != "GET" && request.method != "POST") {
-    return response.status(405).json({ data: "Method Not Allowed" });
-  }
-
-  if (request.method === "GET") {
-    const dbClient = await database.createDbClient();
+  try {
+    dbClient = await database.createDbClient();
 
     migration = await migrationRunner({
-      dryRun: true,
+      dryRun: booleanDryRun,
       dbClient: dbClient,
       dir: join("infra", "migrations"),
       direction: "up",
       verbose: true,
       migrationsTable: "pgmigrations",
     });
-
-    await dbClient.end();
-    return response.status(200).json(migration);
+  } finally {
+    await dbClient?.end();
   }
 
-  if (request.method === "POST") {
-    const dbClient = await database.createDbClient();
-
-    migration = await migrationRunner({
-      dryRun: false,
-      dbClient: dbClient,
-      dir: join("infra", "migrations"),
-      direction: "up",
-      verbose: true,
-      migrationsTable: "pgmigrations",
-    });
-
-    await dbClient.end();
-    return response.status(200).json(migration);
-  }
+  return migration;
 }

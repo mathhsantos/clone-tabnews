@@ -1,6 +1,14 @@
 import database from "infra/database.js";
+import { createRouter } from "next-connect";
+import controller from "infra/controller";
 
-export default async function status(request, response) {
+const route = createRouter();
+
+route.get(getHandler);
+
+export default route.handler(controller.errorHandlers);
+
+async function getHandler(request, response) {
   const countDbConnections = await database.query(
     "SELECT count(*)::int FROM pg_stat_activity WHERE datname = 'local_db';",
   );
