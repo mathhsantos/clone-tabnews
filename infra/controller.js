@@ -7,8 +7,11 @@ function onNoMatchHandler(request, response) {
 
 function onErrorHandler(error, request, response) {
   const publicErrorObject = new InternalServerError({
+    name: error.name,
     cause: error,
     status_code: error.status_code,
+    message: error.message,
+    action: error.action,
   });
 
   console.error(publicErrorObject);

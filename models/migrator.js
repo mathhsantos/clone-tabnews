@@ -15,7 +15,7 @@ export default async function generateMigration(booleanDryRun) {
       dbClient: dbClient,
       dir: join("infra", "migrations"),
       direction: "up",
-      verbose: true,
+      log: () => {},
       migrationsTable: "pgmigrations",
     });
   } catch (error) {
