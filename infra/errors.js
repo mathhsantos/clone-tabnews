@@ -61,6 +61,27 @@ export class ValidationError extends Error {
   }
 }
 
+export class NotFoundError extends Error {
+  constructor({ cause, message, action }) {
+    super(message || "Conteudo não foi encontrado", {
+      cause,
+    });
+
+    this.name = "NotFoundError";
+    this.action = action || "Dados de busca errados ou conteudo não existe";
+    this.status_code = 404;
+  }
+
+  toJSON() {
+    return {
+      name: this.name,
+      message: this.message,
+      action: this.action,
+      status_code: this.status_code,
+    };
+  }
+}
+
 export class MethodNotAllowedError extends Error {
   constructor() {
     super("Um erro interno não esperado aconteceu");
