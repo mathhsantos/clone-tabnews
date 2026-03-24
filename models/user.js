@@ -1,4 +1,5 @@
 import database from "infra/database";
+import password from "models/password";
 import { NotFoundError, ValidationError } from "infra/errors";
 
 async function create(userInputValues) {
@@ -75,7 +76,7 @@ async function runInsertQuery(userInputValues) {
     values: [
       userInputValues.username.toLowerCase(),
       userInputValues.email.toLowerCase(),
-      userInputValues.password,
+      await password.hash(userInputValues.password),
     ],
   });
 
