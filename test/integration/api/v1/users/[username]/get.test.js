@@ -57,7 +57,7 @@ describe("GET to /api/v1/users/[username]", () => {
       expect(responseBody).toEqual({
         name: "NotFoundError",
         message: "Username nonexistentuser não encontrado",
-        action: "Utilize outro username para realizar a busca.",
+        action: "Utilize outro username para realizar esta operação.",
         status_code: 404,
       });
     });

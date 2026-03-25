@@ -11,10 +11,104 @@ async function create(userInputValues) {
   return newUser;
 }
 
+async function runInsertQuery(userInputValues) {
+  const results = await database.query({
+    text: `
+      INSERT INTO 
+        users (username, email, password) 
+        VALUES 
+          ($1, $2, $3)
+        RETURNING
+          *
+        ;`,
+    values: [
+      userInputValues?.username?.toLowerCase(),
+      userInputValues?.email?.toLowerCase(),
+      await password.hash(userInputValues.password),
+    ],
+  });
+
+  return results.rows[0];
+}
+
+async function update(username, userInputValues) {
+  const foundUser = await findOneByUsername(username);
+
+  if ("username" in userInputValues) {
+    await validateUniqueUsername(userInputValues.username);
+  }
+
+  if ("email" in userInputValues) {
+    await validateUniqueEmail(userInputValues.email);
+  }
+
+  const userWithUpdatedValues = {
+    ...foundUser,
+    ...userInputValues,
+  };
+
+  const userUpdated = await runUpdateQuery(userWithUpdatedValues);
+
+  return userUpdated;
+}
+
+async function runUpdateQuery(userWithUpdatedValues) {
+  const results = await database.query({
+    text: `
+      UPDATE 
+        users 
+      SET
+        username = $1,
+        email = $2,
+        password = $3,
+        updated_at = timezone ('utc', now())
+      WHERE
+        id = $4
+        RETURNING
+          *
+        ;`,
+    values: [
+      userWithUpdatedValues.username?.toLowerCase(),
+      userWithUpdatedValues.email?.toLowerCase(),
+      userWithUpdatedValues.password
+        ? await password.hash(userWithUpdatedValues.password)
+        : userWithUpdatedValues.password,
+      userWithUpdatedValues.id,
+    ],
+  });
+
+  return results.rows[0];
+}
+
 async function findOneByUsername(userInputValues) {
   const userFound = await findOne(userInputValues);
 
   return userFound;
+}
+
+async function findOne(username) {
+  const result = await database.query({
+    text: `
+      SELECT
+        *
+      FROM
+        users
+      WHERE
+        username = $1
+      LIMIT
+        1
+      ;`,
+    values: [username],
+  });
+
+  if (result.rowCount === 0) {
+    throw new NotFoundError({
+      message: `Username ${username} não encontrado`,
+      action: "Utilize outro username para realizar esta operação.",
+    });
+  }
+
+  return result.rows[0];
 }
 
 async function validateUniqueEmail(email) {
@@ -33,7 +127,7 @@ async function validateUniqueEmail(email) {
   if (result.rowCount > 0) {
     throw new ValidationError({
       message: "O email informado já está sendo utilizado.",
-      action: "Utilize outro email para realizar o cadastro.",
+      action: "Utilize outro email para realizar esta operação.",
     });
   }
 
@@ -56,86 +150,11 @@ async function validateUniqueUsername(username) {
   if (result.rowCount > 0) {
     throw new ValidationError({
       message: "O username informado já está sendo utilizado.",
-      action: "Utilize outro username para realizar o cadastro.",
+      action: "Utilize outro username para realizar esta operação.",
     });
   }
 
   return;
-}
-
-async function runInsertQuery(userInputValues) {
-  const results = await database.query({
-    text: `
-      INSERT INTO 
-        users (username, email, password) 
-        VALUES 
-          ($1, $2, $3)
-        RETURNING
-          *
-        ;`,
-    values: [
-      userInputValues?.username?.toLowerCase(),
-      userInputValues?.email?.toLowerCase(),
-      await password.hash(userInputValues.password),
-    ],
-  });
-
-  return results.rows[0];
-}
-
-async function findOne(username) {
-  const result = await database.query({
-    text: `
-      SELECT
-        *
-      FROM
-        users
-      WHERE
-        username = $1
-      LIMIT
-        1
-      ;`,
-    values: [username],
-  });
-
-  if (result.rowCount === 0) {
-    throw new NotFoundError({
-      message: `Username ${username} não encontrado`,
-      action: "Utilize outro username para realizar a busca.",
-    });
-  }
-
-  return result.rows[0];
-}
-
-async function update(username, userInputValues) {
-  await findOne(username);
-  await validateUniqueEmail(userInputValues.email);
-  await validateUniqueUsername(userInputValues.username);
-
-  const results = await database.query({
-    text: `
-      UPDATE 
-        users 
-      SET
-        username = $1,
-        email = $2,
-        password = $3,
-        updated_at = now()
-      WHERE
-        username = $4
-        RETURNING
-          *
-        ;`,
-    values: [
-      userInputValues.username.toLowerCase(),
-      userInputValues.email.toLowerCase(),
-      await password.hash(userInputValues.password),
-      username,
-    ],
-  });
-
-  return results.rows[0];
 }
 
 const user = {
