@@ -27,7 +27,7 @@ async function validateUniqueEmail(email) {
       WHERE 
         email = $1
       ;`,
-    values: [email.toLowerCase()],
+    values: [email?.toLowerCase()],
   });
 
   if (result.rowCount > 0) {
@@ -50,7 +50,7 @@ async function validateUniqueUsername(username) {
       WHERE 
         username = $1
       ;`,
-    values: [username.toLowerCase()],
+    values: [username?.toLowerCase()],
   });
 
   if (result.rowCount > 0) {
@@ -74,8 +74,8 @@ async function runInsertQuery(userInputValues) {
           *
         ;`,
     values: [
-      userInputValues.username.toLowerCase(),
-      userInputValues.email.toLowerCase(),
+      userInputValues?.username?.toLowerCase(),
+      userInputValues?.email?.toLowerCase(),
       await password.hash(userInputValues.password),
     ],
   });
@@ -108,9 +108,40 @@ async function findOne(username) {
   return result.rows[0];
 }
 
+async function update(username, userInputValues) {
+  await findOne(username);
+  await validateUniqueEmail(userInputValues.email);
+  await validateUniqueUsername(userInputValues.username);
+
+  const results = await database.query({
+    text: `
+      UPDATE 
+        users 
+      SET
+        username = $1,
+        email = $2,
+        password = $3,
+        updated_at = now()
+      WHERE
+        username = $4
+        RETURNING
+          *
+        ;`,
+    values: [
+      userInputValues.username.toLowerCase(),
+      userInputValues.email.toLowerCase(),
+      await password.hash(userInputValues.password),
+      username,
+    ],
+  });
+
+  return results.rows[0];
+}
+
 const user = {
   create,
   findOneByUsername,
+  update,
 };
 
 export default user;
