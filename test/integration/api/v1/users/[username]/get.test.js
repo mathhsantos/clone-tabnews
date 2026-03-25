@@ -36,7 +36,7 @@ describe("GET to /api/v1/users/[username]", () => {
         id: response2Body.id,
         username: "existinguser",
         email: "existinguser@email.com",
-        password: "senha123",
+        password: response2Body.password,
         created_at: response2Body.created_at,
         updated_at: response2Body.updated_at,
       });
@@ -57,7 +57,7 @@ describe("GET to /api/v1/users/[username]", () => {
       expect(responseBody).toEqual({
         name: "NotFoundError",
         message: "Username nonexistentuser não encontrado",
-        action: "Utilize outro username para realizar a busca.",
+        action: "Utilize outro username para realizar esta operação.",
         status_code: 404,
       });
     });
