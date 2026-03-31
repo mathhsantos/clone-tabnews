@@ -83,8 +83,8 @@ describe("PATCH to /api/v1/users/[username]", () => {
       const responseBody = await response.json();
       expect(responseBody).toEqual({
         name: "NotFoundError",
-        message: "Username nonexistentuser não encontrado",
-        action: "Utilize outro username para realizar esta operação.",
+        message: "Usuario com username: nonexistentuser não encontrado.",
+        action: "Utilize outro username para continuar com esta operação.",
         status_code: 404,
       });
     });

@@ -3,8 +3,6 @@ import bcryptjs from "bcryptjs";
 async function hash(password) {
   const rounds = process.env.NODE_ENV === "production" ? 14 : 1;
 
-  console.log(password, process.env.PAPPER_KEY);
-
   return await bcryptjs.hash(password + process.env.PAPPER_KEY, rounds);
 }
 

@@ -14,8 +14,8 @@ async function create(userInputValues) {
 async function runInsertQuery(userInputValues) {
   const results = await database.query({
     text: `
-      INSERT INTO 
-        users (username, email, password) 
+        INSERT INTO 
+          users (username, email, password) 
         VALUES 
           ($1, $2, $3)
         RETURNING
@@ -81,12 +81,18 @@ async function runUpdateQuery(userWithUpdatedValues) {
 }
 
 async function findOneByUsername(userInputValues) {
-  const userFound = await findOne(userInputValues);
+  const userFound = await findOne("username", userInputValues);
 
   return userFound;
 }
 
-async function findOne(username) {
+async function findOneByEmail(userInputValues) {
+  const userFound = await findOne("email", userInputValues);
+
+  return userFound;
+}
+
+async function findOne(column, value) {
   const result = await database.query({
     text: `
       SELECT
@@ -94,17 +100,17 @@ async function findOne(username) {
       FROM
         users
       WHERE
-        username = $1
+        ${column} = $1
       LIMIT
         1
       ;`,
-    values: [username],
+    values: [value],
   });
 
   if (result.rowCount === 0) {
     throw new NotFoundError({
-      message: `Username ${username} não encontrado`,
-      action: "Utilize outro username para realizar esta operação.",
+      message: `Usuario com ${column}: ${value} não encontrado.`,
+      action: `Utilize outro ${column} para continuar com esta operação.`,
     });
   }
 
@@ -160,6 +166,7 @@ async function validateUniqueUsername(username) {
 const user = {
   create,
   findOneByUsername,
+  findOneByEmail,
   update,
 };
 
