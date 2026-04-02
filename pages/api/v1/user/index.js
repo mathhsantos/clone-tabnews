@@ -34,6 +34,10 @@ async function getHandler(request, response) {
   );
 
   response.setHeader("Set-Cookie", cookieSerialized);
+  response.setHeader(
+    "Cache-Control",
+    "no-store, must-revalidate, no-cache, max-age=0",
+  );
 
   response.status(200).json(foundUser);
 }
