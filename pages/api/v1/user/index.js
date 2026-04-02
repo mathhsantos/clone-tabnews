@@ -16,7 +16,7 @@ async function getHandler(request, response) {
     map: true,
   });
 
-  const sessionId = requesCookies.session_id.value;
+  const sessionId = requesCookies?.session_id?.value;
 
   const foundSession = await session.getSessionById(sessionId);
   const foundUser = await user.findOneById(foundSession.user_id);
