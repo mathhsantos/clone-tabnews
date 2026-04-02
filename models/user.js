@@ -86,6 +86,12 @@ async function findOneByUsername(userInputValues) {
   return userFound;
 }
 
+async function findOneById(userInputValues) {
+  const userFound = await findOne("id", userInputValues);
+
+  return userFound;
+}
+
 async function findOneByEmail(userInputValues) {
   const userFound = await findOne("email", userInputValues);
 
@@ -167,6 +173,7 @@ const user = {
   create,
   findOneByUsername,
   findOneByEmail,
+  findOneById,
   update,
 };
 
