@@ -92,10 +92,38 @@ async function renewSession(sessionId) {
   return results.rows[0];
 }
 
+async function expireSession(sessionId) {
+  const newExpiresAt = new Date(0); // Set to epoch time to expire the session
+  const results = await database.query({
+    text: `
+        UPDATE
+            sessions
+        SET
+            expires_at = $1,
+            updated_at = timezone ('utc', now())
+        WHERE
+            token = $2
+        RETURNING
+          *
+        ;`,
+    values: [newExpiresAt, sessionId],
+  });
+
+  if (results.rowCount === 0) {
+    throw new UnauthorizedError({
+      message: `Sessão não encontrada para renovação.`,
+      action: `Verifique se o token de sessão é válido e tente novamente.`,
+    });
+  }
+
+  return results.rows[0];
+}
+
 const session = {
   createSessionForUser,
   getSessionById,
   renewSession,
+  expireSession,
   EXPIRATION_IN_MILLISECONDS,
 };
 
