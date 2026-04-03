@@ -11,3 +11,10 @@ services:
       DATABASE_URL: ${DATABASE_URL}
     ports:
       - "5432:5432"
+
+  mailcatcher:
+    container_name: "mailcatcher"
+    image: "sj26/mailcatcher:latest"
+    ports:
+      - "1080:1080"
+      - "1025:1025"
