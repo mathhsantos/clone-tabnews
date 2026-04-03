@@ -13,6 +13,12 @@ jobs:
       POSTGRES_HOST: ${{ secrets.POSTGRES_HOST }}
       POSTGRES_PORT: ${{ secrets.POSTGRES_PORT }}
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      EMAIL_SMTP_HOST: ${{ secrets.EMAIL_SMTP_HOST }}
+      EMAIL_SMTP_PORT: ${{ secrets.EMAIL_SMTP_PORT }}
+      EMAIL_SMTP_USERNAME: ${{ secrets.EMAIL_SMTP_USERNAME }}
+      EMAIL_SMTP_PASSWORD: ${{ secrets.EMAIL_SMTP_PASSWORD }}
+      EMAIL_HTTP_HOST: ${{ secrets.EMAIL_HTTP_HOST }}
+      EMAIL_HTTP_PORT: ${{ secrets.EMAIL_HTTP_PORT }}
 
     steps:
       - uses: actions/checkout@v4
